@@ -1,0 +1,134 @@
+﻿ <!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Vuelve a Usar</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            color: #333;
+            text-align: center;
+            padding: 20px;
+        }
+        h1 {
+            color: #2c3e50;
+        }
+        #itemsContainer {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin-top: 20px;
+        }
+        .item {
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 10px;
+            width: 200px;
+            background-color: #fff;
+            position: relative;
+        }
+        .item img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 5px;
+        }
+        button {
+            margin-top: 10px;
+            padding: 5px 10px;
+            border: none;
+            border-radius: 5px;
+            background-color: #3498db;
+            color: white;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #2980b9;
+        }
+        .deleteBtn {
+            background-color: #e74c3c;
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            font-size: 12px;
+        }
+        .deleteBtn:hover {
+            background-color: #c0392b;
+        }
+    </style>
+</head>
+<body>
+    <h1>Vuelve a Usar</h1>
+    <p>Puntos disponibles: <span id="points">5000</span></p>
+
+    <h3>Agregar una prenda</h3>
+    <input type="text" id="itemName" placeholder="Nombre de la prenda">
+    <input type="number" id="itemCost" placeholder="Costo en puntos">
+    <input type="file" id="itemImage">
+    <button onclick="addItem()">Agregar</button>
+
+    <div id="itemsContainer">
+        <!-- Prendas aparecerán aquí -->
+    </div>
+
+    <script>
+        let points = 5000;
+        const pointsDisplay = document.getElementById('points');
+        const itemsContainer = document.getElementById('itemsContainer');
+
+        function updatePoints() {
+            pointsDisplay.textContent = points;
+        }
+
+        function buyItem(cost, itemDiv) {
+            if(points >= cost) {
+                points -= cost;
+                updatePoints();
+                alert("¡Trueque exitoso!");
+                itemDiv.remove(); // opcional: eliminar el item después de truequear
+            } else {
+                alert("No tienes suficientes puntos");
+            }
+        }
+
+        function deleteItem(itemDiv) {
+            if(confirm("¿Quieres eliminar esta prenda?")) {
+                itemDiv.remove();
+            }
+        }
+
+        function addItem() {
+            const name = document.getElementById('itemName').value;
+            const cost = parseInt(document.getElementById('itemCost').value);
+            const imageInput = document.getElementById('itemImage');
+            const file = imageInput.files[0];
+
+            if(!name || !cost || !file) {
+                alert("Completa todos los campos");
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const itemDiv = document.createElement('div');
+                itemDiv.className = 'item';
+                itemDiv.innerHTML = `
+                    <button class="deleteBtn" onclick="deleteItem(this.parentElement)">X</button>
+                    <img src="${e.target.result}" alt="${name}">
+                    <h4>${name}</h4>
+                    <p>Precio: ${cost} puntos</p>
+                    <button onclick="buyItem(${cost}, this.parentElement)">Truequear</button>
+                `;
+                itemsContainer.appendChild(itemDiv);
+
+                // limpiar inputs
+                document.getElementById('itemName').value = '';
+                document.getElementById('itemCost').value = '';
+                document.getElementById('itemImage').value = '';
+            };
+            reader.readAsDataURL(file);
+        }
+    </script>
+</body>
+</html>
